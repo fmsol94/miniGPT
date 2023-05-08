@@ -19,3 +19,4 @@ This will cause information to be aggregated for one main node, and that is some
 5. Review additional papers
 
 6. Why n_embd 384?
+384/6 heads we get a 64 dimension as a standard.

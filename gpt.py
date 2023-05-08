@@ -138,12 +138,12 @@ class Block(nn.Module):
         x = x + self.ffwd(self.ln2(x))
         return x
 
-class BigramLanguageModel(nn.Module):
+class GPTLanguageModel(nn.Module):
     def __init__(self):
         super().__init__()
         # Each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
-        self.position_embedding_table = nn.Embedding(vocab_size, n_embd)
+        self.position_embedding_table = nn.Embedding(block_size, n_embd)
         self.blocks = nn.Sequential(*[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
@@ -187,7 +187,7 @@ class BigramLanguageModel(nn.Module):
         return idx
 
 
-model = BigramLanguageModel()
+model = GPTLanguageModel()
 m = model.to(device)
 
 # Define optimizer
