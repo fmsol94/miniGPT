@@ -256,3 +256,11 @@ class BatchNorm1d:
     def parameters(self):
         return [self.gamma, self.beta]
 # %%
+torch.manual_seed(1337)
+module = BatchNorm1d(100)
+x = torch.randn(32, 100) # Batch size 32 of 100-dimensional vectors
+print(x[:, 0].mean(), x[:, 0].std())
+x = module(x)
+print(x.shape)
+print(x[:, 0].mean(), x[:, 0].std())
+# %%
