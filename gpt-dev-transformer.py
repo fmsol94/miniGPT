@@ -1,5 +1,6 @@
 # %%
 # Imports
+from typing import Any
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
@@ -221,4 +222,37 @@ print(wei.var())
 print(f"Original softmax output: {torch.softmax(torch.tensor([0.1, -0.2, 0.3, -0.2, 0.5]), dim=-1)}")
 for n in range(1, 100, 10):
     print(f"If n factor is {n}, then softmax output is {torch.softmax(n*torch.tensor([0.1, -0.2, 0.3, -0.2, 0.5]), dim=-1)}")
+# %%
+class BatchNorm1d:
+
+    def __init__(self, dim, eps = 1e-5, momentum=.1):
+        self.eps = eps
+        self.momentum = momentum
+        self.training = True
+        # Parameters (trained with backprop)
+        self.gamma = torch.ones(dim)
+        self.beta = torch.zeros(dim)
+        # Buffers (trained with a running "momentum update")
+        self.running_mean = torch.zeros(dim)
+        self.running_var = torch.ones(dim)
+
+    def __call__(self, x):
+        # Calculate the forward pass
+        if self.training:
+            xmean = x.mean(0, keepdim=True) # Batch mean
+            xvar = x.var(0, keepdim=True) # Batch variance
+        else:
+            xmean = self.running_mean
+            xvar = self.running_var
+        xhat = (x - xmean) / torch.sqrt(xvar + self.eps) # Normalize to unit variance
+        self.out = self.gamma * xhat + self.beta
+        # Update buffers
+        if self.training:
+            with torch.no_grad():
+                self.running_mean = (1 - self.momentum) * self.running_mean + self.momentum * xmean
+                self.running_var = (1 - self.momentum) * self.running_var + self.momentum * xvar
+        return self.out
+    
+    def parameters(self):
+        return [self.gamma, self.beta]
 # %%

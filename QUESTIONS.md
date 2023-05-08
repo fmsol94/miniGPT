@@ -11,3 +11,5 @@ for n in range(1, 100, 10):
     print(f"If n factor is {n}, then softmax output is {torch.softmax(n*torch.tensor([0.1, -0.2, 0.3, -0.2, 0.5]), dim=-1)}")
 ```
 This will cause information to be aggregated for one main node, and that is something we want to avoid. Especially during initialization.
+
+3. Why 0 here: x.mean(0, keepdim=True)?
