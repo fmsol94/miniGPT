@@ -13,3 +13,5 @@ for n in range(1, 100, 10):
 This will cause information to be aggregated for one main node, and that is something we want to avoid. Especially during initialization.
 
 3. Why 0 here: x.mean(0, keepdim=True)?
+
+4. Why do we use ```__call__``` in LayerNorm

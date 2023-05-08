@@ -255,12 +255,39 @@ class BatchNorm1d:
     
     def parameters(self):
         return [self.gamma, self.beta]
+    
+# %%
+class LayerNorm1d:
+
+    def __init__(self, dim, eps = 1e-5, momentum=.1):
+        self.eps = eps
+        self.gamma = torch.ones(dim)
+        self.beta = torch.zeros(dim)
+
+    def __call__(self, x):
+        # Calculate the forward pass
+        xmean = x.mean(1, keepdim=True) # Layer mean
+        xvar = x.var(1, keepdim=True) # Layer variance
+        xhat = (x - xmean) / torch.sqrt(xvar + self.eps) # Normalize to unit variance
+        self.out = self.gamma * xhat + self.beta
+        return self.out
+    
+    def parameters(self):
+        return [self.gamma, self.beta]
 # %%
 torch.manual_seed(1337)
-module = BatchNorm1d(100)
-x = torch.randn(32, 100) # Batch size 32 of 100-dimensional vectors
-print(x[:, 0].mean(), x[:, 0].std())
-x = module(x)
-print(x.shape)
-print(x[:, 0].mean(), x[:, 0].std())
+batch_norm = BatchNorm1d(100)
+layer_norm = LayerNorm1d(100)
+x0 = torch.randn(32, 100) # Batch size 32 of 100-dimensional vectors
+print(f"Original array, 1st column mean: {x0[:, 0].mean()}, 1st column std: {x0[:, 0].std()}")
+print(f"Original array, 1st row mean: {x0[0, :].mean()}, 1st row std: {x0[0, :].std()}")
+print()
+x = batch_norm(x0)
+print(f"After BatchNorm, 1st column mean: {x[:, 0].mean()}, 1st column std: {x[:, 0].std()}")
+print(f"After BatchNorm, 1st row mean: {x[0, :].mean()}, 1st row std: {x[0, :].std()}")
+print()
+x = layer_norm(x0)
+print(f"After LayerNorm, 1st column mean: {x[:, 0].mean()}, 1st column std: {x[:, 0].std()}")
+print(f"After LayerNorm, 1st row mean: {x[0, :].mean()}, 1st row std: {x[0, :].std()}")
+print()
 # %%
